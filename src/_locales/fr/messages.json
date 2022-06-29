@@ -1,0 +1,21 @@
+{
+    "display": {
+        "message": "Affichage de WhatsApp Web",
+        "description": "Display WhatsApp Web in"
+    },
+
+    "tab": {
+        "message": "Onglet",
+        "description": "Tab"
+    },
+
+    "popup": {
+        "message": "Pop-up",
+        "description": "Pop-up"
+    },
+
+    "context": {
+        "message": "Ouvrir un onglet WhatsApp Web",
+        "description": "Open a WhatsApp Web tab"
+    }
+} 
