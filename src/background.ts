@@ -96,9 +96,3 @@ browser.webRequest.onBeforeSendHeaders.addListener(
     {urls: [urlWhatsAppWeb]},
     ["blocking", "requestHeaders"]
   );
-
-//@ts-ignore
-let Services = Services;
-
-let xxx: any = Services.scriptSecurityManager.createContentPrincipalFromOrigin("https://web.whatsapp.com/");
-Services.perms.addFromPrincipal(xxx, "desktop-notification", Services.perms.ALLOW_ACTION);
