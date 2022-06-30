@@ -1,4 +1,5 @@
 const urlWhatsAppWeb = "https://web.whatsapp.com/";
+const spaceToolbarButtonId = "wa_in_th_" + (Math.floor(Math.random() * 99999999)).toString();
 
 // Modify User Agent
 // This is necessary as WhatsApp Web only accept few web browsers.
@@ -12,6 +13,7 @@ let browser = browser;
 function initialize(): void {
     setWaInThMode();
     createContextMenu();
+    setSpaceToolbarButton();
 }
 
 function setWaInThMode(): void {
@@ -34,6 +36,43 @@ function createContextMenu(): void {
         contexts: ["browser_action"],
         onclick: createOrActivateTab
     }, console.log("WhatsApp Web context menu created"));
+}
+
+function setSpaceToolbarButton(): void {
+    let getTeInThMode = browser.storage.local.get("wa-in-th-space-toolbar");
+    getTeInThMode.then((storedValue: any) => {
+        console.log("Retrieved", storedValue["wa-in-th-space-toolbar"]);
+        if (storedValue["wa-in-th-space-toolbar"] === "true") {
+            addSpaceToolbarButton();
+            return;
+        } 
+        if (storedValue["wa-in-th-space-toolbar"] === "false") {
+            browser.spacesToolbar.removeButton(spaceToolbarButtonId);
+            return;
+        }
+        console.debug("No wa-in-th-space-toolbar key found in storage.");
+        browser.storage.local.set({ "wa-in-th-space-toolbar": "true" });
+        addSpaceToolbarButton();
+    });
+}
+
+function addSpaceToolbarButton(): void {
+    const label: string = browser.i18n.getMessage("context");
+    try {
+        browser.spacesToolbar.addButton(
+            spaceToolbarButtonId,
+            {
+                defaultIcons: {
+                    "16": "icons/icon16.png",
+                    "32": "icons/icon32.png"
+                },
+                title: label,
+                url: urlWhatsAppWeb
+            });
+        console.log("WhatsApp Web space toolbar menu created");
+    } catch(e: any) {
+        console.log("spacesToolbar is not defined...\n", e);
+    }
 }
 
 async function createOrActivateTab() {
@@ -68,16 +107,20 @@ async function createOrActivateTab() {
     }
 }
 
-function popupSwitch(item: any) {
+function onStorageChange(item: any) {
     if (item.hasOwnProperty("wa-in-th-mode")) {
         item["wa-in-th-mode"].newValue === "popup" ? 
             browser.browserAction.setPopup({ popup: urlWhatsAppWeb }) : 
             browser.browserAction.setPopup({ popup: "" });
     }
+    if (item.hasOwnProperty("wa-in-th-space-toolbar")) {
+        setSpaceToolbarButton();
+    }
 }
 
 /**
  * Modify user agent
+ * Source : https://github.com/mdn/webextensions-examples/tree/master/user-agent-rewriter
  */
 function rewriteUserAgentHeader(e: any) {
   for (let header of e.requestHeaders) {
@@ -89,7 +132,7 @@ function rewriteUserAgentHeader(e: any) {
 }
 
 initialize();
-browser.storage.onChanged.addListener(popupSwitch);
+browser.storage.onChanged.addListener(onStorageChange);
 browser.browserAction.onClicked.addListener(createOrActivateTab);
 browser.webRequest.onBeforeSendHeaders.addListener(
     rewriteUserAgentHeader,

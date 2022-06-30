@@ -13,10 +13,23 @@
             <label id="display">Display</label>
             <span>
                 <input class="browser-style" type="radio" id="mode-switcher-tab" name="mode-switcher" value="tab">
-                <label id="tab" for="mode-switcher1">Tab</label>
+                <label id="tab" for="mode-switcher-tab">Tab</label>
                 <span>&nbsp;</span>
                 <input class="browser-style" type="radio" id="mode-switcher-popup" name="mode-switcher" value="popup">
-                <label id="popup" for="mode-switcher2">Popup</label>
+                <label id="popup" for="mode-switcher-popup">Popup</label>
+            </span>
+        </div>
+
+        <hr class="transparent">
+
+        <div class="addon-option-row">
+            <label id="show-space-toolbar">Show icon in spaces vertical toolbar</label>
+            <span>
+                <input class="browser-style" type="radio" id="space-toolbar-switcher-no" name="space-toolbar-switcher" value="no">
+                <label id="no" for="space-toolbar-switcher-no">No</label>
+                <span>&nbsp;</span>
+                <input class="browser-style" type="radio" id="space-toolbar-switcher-yes" name="space-toolbar-switcher" value="popup">
+                <label id="yes" for="space-toolbar-switcher-yes">Yes</label>
             </span>
         </div>
     </div>
@@ -41,6 +54,10 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+    }
+
+    .transparent {
+        color: rgba(0, 0, 0, 0);
     }
 </style>
 <script src="options.js"></script>

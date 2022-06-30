@@ -71,4 +71,5 @@ The above-mentioned trademarks are only used to refer to products.
 WhatsApp Web in Thunderbird and its developer are not affiliated, sponsored nor endorsed by any of the above-mentioned organizations.  
 
 <h2>Changelog</h2>
+1.1.0 -> add space toolbar icon for Thunderbird > 100, diverse fixes
 1.0.0 -> first release  
