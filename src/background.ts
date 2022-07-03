@@ -1,5 +1,5 @@
 const urlWhatsAppWeb = "https://web.whatsapp.com/";
-const spaceToolbarButtonId = "wa_in_th_" + (Math.floor(Math.random() * 99999999)).toString();
+const spacesToolbarButtonId = "wa_in_th_" + (Math.floor(Math.random() * 99999999)).toString();
 
 // Modify User Agent
 // This is necessary as WhatsApp Web only accept few web browsers.
@@ -13,7 +13,7 @@ let browser = browser;
 function initialize(): void {
     setWaInThMode();
     createContextMenu();
-    setSpaceToolbarButton();
+    setSpacesToolbarButton();
 }
 
 function setWaInThMode(): void {
@@ -35,32 +35,30 @@ function createContextMenu(): void {
         type: "normal",
         contexts: ["browser_action"],
         onclick: createOrActivateTab
-    }, console.log("WhatsApp Web context menu created"));
+    }, console.log("WhatsApp Web context menu created."));
 }
 
-function setSpaceToolbarButton(): void {
-    let getTeInThMode = browser.storage.local.get("wa-in-th-space-toolbar");
+function setSpacesToolbarButton(): void {
+    let getTeInThMode = browser.storage.local.get("wa-in-th-spaces-toolbar");
     getTeInThMode.then((storedValue: any) => {
-        console.log("Retrieved", storedValue["wa-in-th-space-toolbar"]);
-        if (storedValue["wa-in-th-space-toolbar"] === "true") {
-            addSpaceToolbarButton();
+        if (storedValue["wa-in-th-spaces-toolbar"] === "true") {
+            addSpacesToolbarButton();
             return;
         } 
-        if (storedValue["wa-in-th-space-toolbar"] === "false") {
-            browser.spacesToolbar.removeButton(spaceToolbarButtonId);
+        if (storedValue["wa-in-th-spaces-toolbar"] === "false") {
+            removeSpacesToolbarButton();
             return;
         }
-        console.debug("No wa-in-th-space-toolbar key found in storage.");
-        browser.storage.local.set({ "wa-in-th-space-toolbar": "true" });
-        addSpaceToolbarButton();
+        browser.storage.local.set({ "wa-in-th-spaces-toolbar": "true" });
+        addSpacesToolbarButton();
     });
 }
 
-function addSpaceToolbarButton(): void {
+function addSpacesToolbarButton(): void {
     const label: string = browser.i18n.getMessage("context");
     try {
         browser.spacesToolbar.addButton(
-            spaceToolbarButtonId,
+            spacesToolbarButtonId,
             {
                 defaultIcons: {
                     "16": "icons/icon16.png",
@@ -69,7 +67,17 @@ function addSpaceToolbarButton(): void {
                 title: label,
                 url: urlWhatsAppWeb
             });
-        console.log("WhatsApp Web space toolbar menu created");
+        console.log("WhatsApp Web spaces toolbar menu created.");
+    } catch(e: any) {
+        console.log("spacesToolbar is not defined...\n", e);
+    }
+}
+
+function removeSpacesToolbarButton(): void {
+    const label: string = browser.i18n.getMessage("context");
+    try {
+        browser.spacesToolbar.removeButton(spacesToolbarButtonId);
+        console.log("WhatsApp Web spaces toolbar menu removed.");
     } catch(e: any) {
         console.log("spacesToolbar is not defined...\n", e);
     }
@@ -113,8 +121,8 @@ function onStorageChange(item: any) {
             browser.browserAction.setPopup({ popup: urlWhatsAppWeb }) : 
             browser.browserAction.setPopup({ popup: "" });
     }
-    if (item.hasOwnProperty("wa-in-th-space-toolbar")) {
-        setSpaceToolbarButton();
+    if (item.hasOwnProperty("wa-in-th-spaces-toolbar")) {
+        setSpacesToolbarButton();
     }
 }
 

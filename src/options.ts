@@ -4,11 +4,12 @@ let labelTab: HTMLElement | null = document.getElementById("tab");
 let labelPopup: HTMLElement | null = document.getElementById("popup");
 let labelDisplay: HTMLElement | null = document.getElementById("display");
 
-let buttonNo: HTMLElement | null = document.getElementById("space-toolbar-switcher-no");
-let buttonYes: HTMLElement | null = document.getElementById("space-toolbar-switcher-yes");
+let spacesToolbarOptions: HTMLElement | null = document.getElementById("spaces-toolbar-options");
+let buttonNo: HTMLElement | null = document.getElementById("spaces-toolbar-switcher-no");
+let buttonYes: HTMLElement | null = document.getElementById("spaces-toolbar-switcher-yes");
 let labelNo: HTMLElement | null = document.getElementById("no");
 let labelYes: HTMLElement | null = document.getElementById("yes");
-let labelShowSpaceToolbar: HTMLElement | null = document.getElementById("show-space-toolbar");
+let labelShowSpacesToolbar: HTMLElement | null = document.getElementById("show-spaces-toolbar");
 //@ts-ignore
 let browser = browser;
 
@@ -32,14 +33,20 @@ function initializeDisplayInputs(): void {
     });
 }
 
-function initializeSpaceToolbarInputs(): void {
-    let getWaInThSpaceToolbar = browser.storage.local.get("wa-in-th-space-toolbar");
-    getWaInThSpaceToolbar.then((storedValue: any) => {
+function initializeSpacesToolbarInputs(): void {
+    if (browser.spacesToolbar) {
+        spacesToolbarOptions?.removeAttribute("style");
+    } else {
+        return;
+    }
+
+    let getWaInThSpacesToolbar = browser.storage.local.get("wa-in-th-spaces-toolbar");
+    getWaInThSpacesToolbar.then((storedValue: any) => {
         if (!(buttonNo instanceof HTMLElement && buttonYes instanceof HTMLElement)) {
             return;
         }
-        if (storedValue.hasOwnProperty("wa-in-th-space-toolbar")) {
-            switch (storedValue["wa-in-th-space-toolbar"]) {
+        if (storedValue.hasOwnProperty("wa-in-th-spaces-toolbar")) {
+            switch (storedValue["wa-in-th-spaces-toolbar"]) {
                 case "false":
                     buttonNo.setAttribute("checked", "true");
                     return;
@@ -68,8 +75,8 @@ function internationalize() {
     if (labelYes instanceof HTMLElement) {
         labelYes.innerText = browser.i18n.getMessage("yes");
     }
-    if (labelShowSpaceToolbar instanceof HTMLElement) {
-        labelShowSpaceToolbar.innerText = browser.i18n.getMessage("show-space-toolbar");
+    if (labelShowSpacesToolbar instanceof HTMLElement) {
+        labelShowSpacesToolbar.innerText = browser.i18n.getMessage("show-spaces-toolbar");
     }
 }
 
@@ -77,22 +84,20 @@ function onClickModeSwitcher(newValue: string): void {
     browser.storage.local.set({ "wa-in-th-mode": newValue });
 }
 
-
 if (buttonTab instanceof HTMLElement && buttonPopup instanceof HTMLElement) {
     buttonTab.addEventListener("input", () => onClickModeSwitcher("tab"));
     buttonPopup.addEventListener("input", () => onClickModeSwitcher("popup"));
 }
 
-function onClickSpaceToolbarSwitcher(newValue: string): void {
-    browser.storage.local.set({ "wa-in-th-space-toolbar": newValue });
+function onClickSpacesToolbarSwitcher(newValue: string): void {
+    browser.storage.local.set({ "wa-in-th-spaces-toolbar": newValue });
 }
 
-
 if (buttonNo instanceof HTMLElement && buttonYes instanceof HTMLElement) {
-    buttonNo.addEventListener("input", () => onClickSpaceToolbarSwitcher("false"));
-    buttonYes.addEventListener("input", () => onClickSpaceToolbarSwitcher("true"));
+    buttonNo.addEventListener("input", () => onClickSpacesToolbarSwitcher("false"));
+    buttonYes.addEventListener("input", () => onClickSpacesToolbarSwitcher("true"));
 }
 
 initializeDisplayInputs();
-initializeSpaceToolbarInputs();
+initializeSpacesToolbarInputs();
 internationalize();
