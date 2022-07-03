@@ -1,4 +1,5 @@
 const urlWhatsAppWeb = "https://web.whatsapp.com/";
+const spacesToolbarButtonId = "wa_in_th_" + (Math.floor(Math.random() * 99999999)).toString();
 
 // Modify User Agent
 // This is necessary as WhatsApp Web only accept few web browsers.
@@ -12,6 +13,7 @@ let browser = browser;
 function initialize(): void {
     setWaInThMode();
     createContextMenu();
+    setSpacesToolbarButton();
 }
 
 function setWaInThMode(): void {
@@ -33,7 +35,52 @@ function createContextMenu(): void {
         type: "normal",
         contexts: ["browser_action"],
         onclick: createOrActivateTab
-    }, console.log("WhatsApp Web context menu created"));
+    }, console.log("WhatsApp Web context menu created."));
+}
+
+function setSpacesToolbarButton(): void {
+    let getTeInThMode = browser.storage.local.get("wa-in-th-spaces-toolbar");
+    getTeInThMode.then((storedValue: any) => {
+        if (storedValue["wa-in-th-spaces-toolbar"] === "true") {
+            addSpacesToolbarButton();
+            return;
+        } 
+        if (storedValue["wa-in-th-spaces-toolbar"] === "false") {
+            removeSpacesToolbarButton();
+            return;
+        }
+        browser.storage.local.set({ "wa-in-th-spaces-toolbar": "true" });
+        addSpacesToolbarButton();
+    });
+}
+
+function addSpacesToolbarButton(): void {
+    const label: string = browser.i18n.getMessage("context");
+    try {
+        browser.spacesToolbar.addButton(
+            spacesToolbarButtonId,
+            {
+                defaultIcons: {
+                    "16": "icons/icon16.png",
+                    "32": "icons/icon32.png"
+                },
+                title: label,
+                url: urlWhatsAppWeb
+            });
+        console.log("WhatsApp Web spaces toolbar menu created.");
+    } catch(e: any) {
+        console.log("spacesToolbar is not defined...\n", e);
+    }
+}
+
+function removeSpacesToolbarButton(): void {
+    const label: string = browser.i18n.getMessage("context");
+    try {
+        browser.spacesToolbar.removeButton(spacesToolbarButtonId);
+        console.log("WhatsApp Web spaces toolbar menu removed.");
+    } catch(e: any) {
+        console.log("spacesToolbar is not defined...\n", e);
+    }
 }
 
 async function createOrActivateTab() {
@@ -68,16 +115,20 @@ async function createOrActivateTab() {
     }
 }
 
-function popupSwitch(item: any) {
+function onStorageChange(item: any) {
     if (item.hasOwnProperty("wa-in-th-mode")) {
         item["wa-in-th-mode"].newValue === "popup" ? 
             browser.browserAction.setPopup({ popup: urlWhatsAppWeb }) : 
             browser.browserAction.setPopup({ popup: "" });
     }
+    if (item.hasOwnProperty("wa-in-th-spaces-toolbar")) {
+        setSpacesToolbarButton();
+    }
 }
 
 /**
  * Modify user agent
+ * Source : https://github.com/mdn/webextensions-examples/tree/master/user-agent-rewriter
  */
 function rewriteUserAgentHeader(e: any) {
   for (let header of e.requestHeaders) {
@@ -89,16 +140,10 @@ function rewriteUserAgentHeader(e: any) {
 }
 
 initialize();
-browser.storage.onChanged.addListener(popupSwitch);
+browser.storage.onChanged.addListener(onStorageChange);
 browser.browserAction.onClicked.addListener(createOrActivateTab);
 browser.webRequest.onBeforeSendHeaders.addListener(
     rewriteUserAgentHeader,
     {urls: [urlWhatsAppWeb]},
     ["blocking", "requestHeaders"]
   );
-
-//@ts-ignore
-let Services = Services;
-
-let xxx: any = Services.scriptSecurityManager.createContentPrincipalFromOrigin("https://web.whatsapp.com/");
-Services.perms.addFromPrincipal(xxx, "desktop-notification", Services.perms.ALLOW_ACTION);
